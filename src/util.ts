@@ -20,19 +20,18 @@ import type {
     TextChannel,
     VoiceChannel,
     NewsChannel,
-    PremiumTier,
     ThreadChannel,
     Webhook
 } from 'discord.js';
 import nodeFetch from 'node-fetch';
 import { GuildPremiumTier, ChannelType, OverwriteType, GuildDefaultMessageNotifications, GuildFeature, GuildExplicitContentFilter, GuildVerificationLevel, GuildSystemChannelFlags } from 'discord.js';
 
-/*const MaxBitratePerTier: Record<PremiumTier, number> = {
+const MaxBitratePerTier: Record<GuildPremiumTier, number> = {
     None: 64000,
     Tier1: 128000,
     Tier2: 256000,
     Tier3: 384000
-};*/
+};
 
 /**
  * Gets the permissions for a channel
@@ -253,9 +252,9 @@ export async function loadChannel(
         } else if (channelData.type === ChannelType.GuildVoice) {
             // Downgrade bitrate
             let bitrate = (channelData as VoiceChannelData).bitrate;
-            const bitrates = Object.values(GuildPremiumTier);
-            while (bitrate > GuildPremiumTier[guild.premiumTier]) {
-                bitrate = bitrates[Object.keys(GuildPremiumTier).indexOf(guild.premiumTier) - 1];
+            const bitrates = Object.values(MaxBitratePerTier);
+            while (bitrate > MaxBitratePerTier[guild.premiumTier]) {
+                bitrate = bitrates[Object.keys(MaxBitratePerTier).indexOf(guild.premiumTier) - 1];
             }
             createOptions.bitrate = bitrate;
             createOptions.userLimit = (channelData as VoiceChannelData).userLimit;
