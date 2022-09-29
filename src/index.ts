@@ -97,7 +97,7 @@ export const create = async (
                 members: [],
                 createdTimestamp: Date.now(),
                 guildID: guild.id,
-                id: options.backupID ?? SnowflakeUtil.generate(Date.now())
+                id: options.backupID ?? SnowflakeUtil.generate(new Date(Date.now()))
             };
             if (guild.iconURL()) {
                 if (options && options.saveImages && options.saveImages === 'base64') {

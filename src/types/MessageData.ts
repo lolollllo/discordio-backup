@@ -1,5 +1,4 @@
-import { EmbedBuilder } from 'discord.js';
-import type { FileOptions } from 'discord.js';
+import { EmbedBuilder, FileOptions } from 'discord.js';
 
 export interface MessageData {
     username: string;
