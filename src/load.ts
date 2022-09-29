@@ -1,5 +1,6 @@
 import type { BackupData, LoadOptions } from './types';
-import type { ChannelType, Emoji, Guild, GuildFeature, GuildChannel, Role, VoiceChannel } from 'discord.js';
+import type { Emoji, Guild, GuildChannel, Role, VoiceChannel } from 'discord.js';
+import { ChannelType, GuildFeature } from 'discord.js';
 import { loadCategory, loadChannel } from './util';
 
 /**
@@ -77,7 +78,7 @@ export const loadChannels = (guild: Guild, backupData: BackupData, options: Load
         loadChannelPromises.push(
             new Promise((resolve) => {
                 loadCategory(categoryData, guild).then((createdCategory) => {
-                    categoryData.children.cache.forEach((channelData) => {
+                    categoryData.children.cache.forEach((channelData: Any) => {
                         loadChannel(channelData, guild, createdCategory, options);
                         resolve(true);
                     });
