@@ -10,7 +10,7 @@ import type {
 } from './types';
 import type {
     CategoryChannel,
-    ChannelLogsQueryOptions,
+    FetchMessagesOptions,
     Collection,
     Guild,
     GuildChannelCreateOptions,
@@ -27,10 +27,10 @@ import nodeFetch from 'node-fetch';
 import { GuildPremiumTier, ChannelType, OverwriteType, GuildDefaultMessageNotifications, GuildFeature, GuildExplicitContentFilter, GuildVerificationLevel, GuildSystemChannelFlags } from 'discord.js';
 
 const MaxBitratePerTier: Record<GuildPremiumTier, number> = {
-    None: 64000,
-    Tier1: 128000,
-    Tier2: 256000,
-    Tier3: 384000
+    None: 0,
+    Tier1: 1,
+    Tier2: 2,
+    Tier3: 3
 };
 
 /**
@@ -75,7 +75,7 @@ export async function fetchVoiceChannelData(channel: VoiceChannel) {
 export async function fetchChannelMessages (channel: TextChannel | NewsChannel | ThreadChannel, options: CreateOptions): Promise<MessageData[]> {
     let messages: MessageData[] = [];
     const messageCount: number = isNaN(options.maxMessagesPerChannel) ? 10 : options.maxMessagesPerChannel;
-    const fetchOptions: ChannelLogsQueryOptions = { limit: 100 };
+    const fetchOptions: FetchMessagesOptions = { limit: 100 };
     let lastMessageId: Snowflake;
     let fetchComplete: boolean = false;
     while (!fetchComplete) {
