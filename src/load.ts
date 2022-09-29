@@ -140,6 +140,12 @@ export const loadBans = (guild: Guild, backupData: BackupData): Promise<string[]
 export const loadEmbedChannel = (guild: Guild, backupData: BackupData): Promise<Guild[]> => {
     const embedChannelPromises: Promise<Guild>[] = [];
     if (backupData.widget.channel) {
+        if (backupData.widget.channel.type !== ChannelType.GuildText) return;
+        if (backupData.widget.channel.type !== ChannelType.NewsChannel) return;
+        if (backupData.widget.channel.type !== ChannelType.VoiceChannel) return;
+        if (backupData.widget.channel.type !== ChannelType.StageChannel) return;
+        if (backupData.widget.channel.type !== ChannelType.ForumChannel) return;
+        if (!backupData.widget.channel.id) return;
         embedChannelPromises.push(
             guild.setWidgetSettings({
                 enabled: backupData.widget.enabled,
