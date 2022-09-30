@@ -43,10 +43,13 @@ export async function getMembers(guild: Guild) {
             userId: member.user.id, // Member ID
             username: member.user.username, // Member username
             discriminator: member.user.discriminator, // Member discriminator
-            avatarUrl: member.user.avatarURL(), // Member avatar URL
+            avatarUrl: member.user.displayAvatarURL(), // Member avatar URL
             joinedTimestamp: member.joinedTimestamp, // Member joined timestamp
             roles: member.roles.cache.map((role) => role.id), // Member roles
-            bot: member.user.bot // Member bot
+            bot: member.user.bot, // Member bot
+            tag: member.user.tag, //Member tag
+            nickname: member.displayName, //Member nickname
+            accentColor: member.user.accentColor //Member banner color
         });
     });
     return members;

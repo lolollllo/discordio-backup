@@ -6,4 +6,7 @@ export interface MemberData {
     joinedTimestamp: number;
     roles: string[];
     bot: boolean;
+    tag: string;
+    nickname: string;
+    accentColor: number;
 }
