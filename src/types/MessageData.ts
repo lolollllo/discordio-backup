@@ -1,16 +1,12 @@
-import { EmbedBuilder } from 'discord.js';
-import { Buffer } from 'node:buffer';
+import { APIEmbed, FileOptions } from 'discord.js';
+
 
 export interface MessageData {
     username: string;
     avatar?: string;
     content?: string;
-    embeds?: EmbedBuilder;
-    files?: {
-        name: string;
-        description: string;
-        attachment: string | Buffer;
-    };
+    embeds?: APIEmbed[];
+    files?: FileOptions;
     pinned?: boolean;
     sentAt: string;
 }

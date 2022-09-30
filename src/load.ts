@@ -1,6 +1,6 @@
 import type { BackupData, LoadOptions } from './types';
-import type { Emoji, Guild, GuildChannel, Role, VoiceChannel } from 'discord.js';
-import { ChannelType, GuildFeature } from 'discord.js';
+import type { Emoji, Guild, Role, VoiceChannel } from 'discord.js';
+import { ChannelType, GuildFeature, TextChannel } from 'discord.js';
 import { loadCategory, loadChannel } from './util';
 
 /**
@@ -78,7 +78,7 @@ export const loadChannels = (guild: Guild, backupData: BackupData, options: Load
         loadChannelPromises.push(
             new Promise((resolve) => {
                 loadCategory(categoryData, guild).then((createdCategory) => {
-                    categoryData.children.cache.forEach((channelData: Any) => {
+                    categoryData.children.forEach((channelData: any) => {
                         loadChannel(channelData, guild, createdCategory, options);
                         resolve(true);
                     });
@@ -140,11 +140,10 @@ export const loadBans = (guild: Guild, backupData: BackupData): Promise<string[]
 export const loadEmbedChannel = (guild: Guild, backupData: BackupData): Promise<Guild[]> => {
     const embedChannelPromises: Promise<Guild>[] = [];
     if (backupData.widget.channel) {
-        if (!backupData.widget.channel.id) return;
         embedChannelPromises.push(
             guild.setWidgetSettings({
                 enabled: backupData.widget.enabled,
-                channel: guild.channels.cache.find((ch) => ch.name === backupData.widget.channel)
+                channel: guild.channels.cache.find((ch) => ch.name === backupData.widget.channel) as TextChannel
             })
         );
     }
