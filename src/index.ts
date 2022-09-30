@@ -3,7 +3,7 @@ import type { Guild } from 'discord.js';
 import { SnowflakeUtil, IntentsBitField } from 'discord.js';
 
 import nodeFetch from 'node-fetch';
-import { sep } from 'path';
+import { sep } from 'node:path';
 
 import { existsSync, mkdirSync, statSync, unlinkSync } from 'fs';
 import { writeFile, readdir } from 'fs/promises';
@@ -97,7 +97,7 @@ export const create = async (
                 members: [],
                 createdTimestamp: Date.now(),
                 guildID: guild.id,
-                id: options.backupID ?? SnowflakeUtil.generate(new Date(Date.now()))
+                id: options.backupID ?? SnowflakeUtil.generate().toString()
             };
             if (guild.iconURL()) {
                 if (options && options.saveImages && options.saveImages === 'base64') {
