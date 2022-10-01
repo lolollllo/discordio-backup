@@ -14,7 +14,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/lolollllo/discord-backup.git"
+        "url": "git+https://github.com/lolollllo/discordio-backup.git"
     },
     "keywords": [
         "discord",
@@ -27,9 +27,9 @@
     "author": "lolollllo",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/lolollllo/discord-backup/issues"
+        "url": "https://github.com/lolollllo/discordio-backup/issues"
     },
-    "homepage": "https://github.com/lolollllo/discord-backup#readme",
+    "homepage": "https://github.com/lolollllo/discordio-backup#readme",
     "dependencies": {
         "discord.js": "^14.5.0"
     },
