@@ -1,6 +1,5 @@
 import { APIEmbed } from 'discord.js';
 
-
 export interface MessageData {
     username: string;
     avatar?: string;

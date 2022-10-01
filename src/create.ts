@@ -8,7 +8,16 @@ import type {
     TextChannelData,
     VoiceChannelData
 } from './types';
-import type { CategoryChannel, Collection, Guild, GuildChannel, Snowflake, TextChannel, ThreadChannel, VoiceChannel } from 'discord.js';
+import type {
+    CategoryChannel,
+    Collection,
+    Guild,
+    GuildChannel,
+    Snowflake,
+    TextChannel,
+    ThreadChannel,
+    VoiceChannel
+} from 'discord.js';
 import { ChannelType } from 'discord.js';
 import nodeFetch from 'node-fetch';
 import { fetchChannelPermissions, fetchTextChannelData, fetchVoiceChannelData } from './util';
@@ -115,8 +124,12 @@ export async function getChannels(guild: Guild, options: CreateOptions) {
             others: []
         };
         // Gets the list of the categories and sort them by position
-        const categories = (guild.channels.cache
-            .filter((ch) => ch.type === ChannelType.GuildCategory) as Collection<Snowflake, CategoryChannel>)
+        const categories = (
+            guild.channels.cache.filter((ch) => ch.type === ChannelType.GuildCategory) as Collection<
+                Snowflake,
+                CategoryChannel
+            >
+        )
             .sort((a, b) => a.position - b.position)
             .toJSON() as CategoryChannel[];
         for (const category of categories) {
@@ -140,12 +153,18 @@ export async function getChannels(guild: Guild, options: CreateOptions) {
             channels.categories.push(categoryData); // Update channels object
         }
         // Gets the list of the other channels (that are not in a category) and sort them by position
-        const others = (guild.channels.cache
-            .filter((ch) => {
-                return !ch.parent && ch.type !== ChannelType.GuildCategory
+        const others = (
+            guild.channels.cache.filter((ch) => {
+                return (
+                    !ch.parent &&
+                    ch.type !== ChannelType.GuildCategory &&
                     //&& ch.type !== 'GuildStore' // there is no way to restore store channels, ignore them
-                    && ch.type !== ChannelType.GuildNewsThread && ch.type !== ChannelType.GuildPrivateThread && ch.type !== ChannelType.GuildPublicThread // threads will be saved with fetchTextChannelData
-            }) as Collection<Snowflake, Exclude<GuildChannel, ThreadChannel>>)
+                    ch.type !== ChannelType.GuildNewsThread &&
+                    ch.type !== ChannelType.GuildPrivateThread &&
+                    ch.type !== ChannelType.GuildPublicThread
+                ); // threads will be saved with fetchTextChannelData
+            }) as Collection<Snowflake, Exclude<GuildChannel, ThreadChannel>>
+        )
             .sort((a, b) => a.position - b.position)
             .toJSON();
         for (const channel of others) {
