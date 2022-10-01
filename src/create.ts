@@ -142,7 +142,7 @@ export async function getChannels(guild: Guild, options: CreateOptions) {
             const children = category.children.cache.sort((a, b) => a.position - b.position).toJSON();
             for (const child of children) {
                 // For each child channel
-                if (child.type === ChannelType.GuildText || child.type === ChannelType.GuildNews) {
+                if (child.type === ChannelType.GuildText || child.type === ChannelType.GuildAnnouncement) {
                     const channelData: TextChannelData = await fetchTextChannelData(child as TextChannel, options); // Gets the channel data
                     categoryData.children.push(channelData); // And then push the child in the categoryData
                 } else {
@@ -159,9 +159,9 @@ export async function getChannels(guild: Guild, options: CreateOptions) {
                     !ch.parent &&
                     ch.type !== ChannelType.GuildCategory &&
                     //&& ch.type !== 'GuildStore' // there is no way to restore store channels, ignore them
-                    ch.type !== ChannelType.GuildNewsThread &&
-                    ch.type !== ChannelType.GuildPrivateThread &&
-                    ch.type !== ChannelType.GuildPublicThread
+                    ch.type !== ChannelType.AnnouncementThread &&
+                    ch.type !== ChannelType.PrivateThread &&
+                    ch.type !== ChannelType.PublicThread
                 ); // threads will be saved with fetchTextChannelData
             }) as Collection<Snowflake, Exclude<GuildChannel, ThreadChannel>>
         )
@@ -169,7 +169,7 @@ export async function getChannels(guild: Guild, options: CreateOptions) {
             .toJSON();
         for (const channel of others) {
             // For each channel
-            if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildNews) {
+            if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement) {
                 const channelData: TextChannelData = await fetchTextChannelData(channel as TextChannel, options); // Gets the channel data
                 channels.others.push(channelData); // Update channels object
             } else {
