@@ -159,7 +159,7 @@ backup.load(backupData, guild, {
 // Load modules
 const { Client, PermissionFlagsBits, EmbedBuilder, GatewayIntentBits } = require("discord.js")
 const backup = require("discordio-backup")
-const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildMessages, Discord.GatewayIntentBits.MessageContent ]})
+const client = new Client({ intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildMessages, Discord.GatewayIntentBits.MessageContent ]})
 const settings = {
     prefix: "b!",
     token: "YOURTOKEN"
