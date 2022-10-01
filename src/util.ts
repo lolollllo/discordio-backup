@@ -24,14 +24,16 @@ import type {
     Webhook
 } from 'discord.js';
 import nodeFetch from 'node-fetch';
-import { GuildPremiumTier, ChannelType, OverwriteType, GuildDefaultMessageNotifications, GuildFeature, GuildExplicitContentFilter, GuildVerificationLevel, GuildSystemChannelFlags } from 'discord.js';
-
-const MaxBitratePerTier: Record<GuildPremiumTier, number> = {
-    None: 0,
-    Tier1: 1,
-    Tier2: 2,
-    Tier3: 3
-};
+import {
+    GuildPremiumTier,
+    ChannelType,
+    OverwriteType,
+    GuildDefaultMessageNotifications,
+    GuildFeature,
+    GuildExplicitContentFilter,
+    GuildVerificationLevel,
+    GuildSystemChannelFlags
+} from 'discord.js';
 
 /**
  * Gets the permissions for a channel
@@ -72,7 +74,10 @@ export async function fetchVoiceChannelData(channel: VoiceChannel) {
     });
 }
 
-export async function fetchChannelMessages (channel: TextChannel | NewsChannel | ThreadChannel, options: CreateOptions): Promise<MessageData[]> {
+export async function fetchChannelMessages(
+    channel: TextChannel | NewsChannel | ThreadChannel,
+    options: CreateOptions
+): Promise<MessageData[]> {
     let messages: MessageData[] = [];
     const messageCount: number = isNaN(options.maxMessagesPerChannel) ? 10 : options.maxMessagesPerChannel;
     const fetchOptions: FetchMessagesOptions = { limit: 100 };
@@ -87,37 +92,41 @@ export async function fetchChannelMessages (channel: TextChannel | NewsChannel |
             break;
         }
         lastMessageId = fetched.last().id;
-        await Promise.all(fetched.map(async (msg) => {
-            if (!msg.author || messages.length >= messageCount) {
-                fetchComplete = true;
-                return;
-            }
-            const files = await Promise.all(msg.attachments.map(async (a) => {
-                let attach = a.url
-                if (a.url && ['png', 'jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi'].includes(a.url)) {
-                    if (options.saveImages && options.saveImages === 'base64') {
-                        attach = (await (nodeFetch(a.url).then((res) => res.buffer()))).toString('base64')
-                    }
+        await Promise.all(
+            fetched.map(async (msg) => {
+                if (!msg.author || messages.length >= messageCount) {
+                    fetchComplete = true;
+                    return;
                 }
-                return {
-                    name: a.name,
-                    attachment: attach
-                };
-            }))
-            messages.push({
-                username: msg.author.username,
-                avatar: msg.author.displayAvatarURL(),
-                content: msg.cleanContent,
-                embeds: msg.embeds,
-                files,
-                pinned: msg.pinned,
-                sentAt: msg.createdAt.toISOString(),
-            });
-        }));
+                const files = await Promise.all(
+                    msg.attachments.map(async (a) => {
+                        let attach = a.url;
+                        if (a.url && ['png', 'jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi'].includes(a.url)) {
+                            if (options.saveImages && options.saveImages === 'base64') {
+                                attach = (await nodeFetch(a.url).then((res) => res.buffer())).toString('base64');
+                            }
+                        }
+                        return {
+                            name: a.name,
+                            attachment: attach
+                        };
+                    })
+                );
+                messages.push({
+                    username: msg.author.username,
+                    avatar: msg.author.displayAvatarURL(),
+                    content: msg.cleanContent,
+                    embeds: msg.embeds,
+                    files,
+                    pinned: msg.pinned,
+                    sentAt: msg.createdAt.toISOString()
+                });
+            })
+        );
     }
 
     return messages;
-} 
+}
 
 /**
  * Fetches the text channel data that is necessary for the backup
@@ -138,24 +147,26 @@ export async function fetchTextChannelData(channel: TextChannel | NewsChannel, o
         };
         /* Fetch channel threads */
         if (channel.threads.cache.size > 0) {
-            await Promise.all(channel.threads.cache.map(async (thread) => {
-                const threadData: ThreadChannelData = {
-                    type: thread.type,
-                    name: thread.name,
-                    archived: thread.archived,
-                    autoArchiveDuration: thread.autoArchiveDuration,
-                    locked: thread.locked,
-                    rateLimitPerUser: thread.rateLimitPerUser,
-                    messages: []
-                };
-                try {
-                    threadData.messages = await fetchChannelMessages(thread, options);
-                    /* Return thread data */
-                    channelData.threads.push(threadData);
-                } catch {
-                    channelData.threads.push(threadData);
-                }
-            }));
+            await Promise.all(
+                channel.threads.cache.map(async (thread) => {
+                    const threadData: ThreadChannelData = {
+                        type: thread.type,
+                        name: thread.name,
+                        archived: thread.archived,
+                        autoArchiveDuration: thread.autoArchiveDuration,
+                        locked: thread.locked,
+                        rateLimitPerUser: thread.rateLimitPerUser,
+                        messages: []
+                    };
+                    try {
+                        threadData.messages = await fetchChannelMessages(thread, options);
+                        /* Return thread data */
+                        channelData.threads.push(threadData);
+                    } catch {
+                        channelData.threads.push(threadData);
+                    }
+                })
+            );
         }
         /* Fetch channel messages */
         try {
@@ -174,25 +185,27 @@ export async function fetchTextChannelData(channel: TextChannel | NewsChannel, o
  */
 export async function loadCategory(categoryData: CategoryData, guild: Guild) {
     return new Promise<CategoryChannel>((resolve) => {
-        guild.channels.create({
-            name: categoryData.name,
-            type: ChannelType.GuildCategory
-        }).then(async (category) => {
-            // When the category is created
-            const finalPermissions: OverwriteData[] = [];
-            categoryData.permissions.forEach((perm) => {
-                const role = guild.roles.cache.find((r) => r.name === perm.roleName);
-                if (role) {
-                    finalPermissions.push({
-                        id: role.id,
-                        allow: BigInt(perm.allow),
-                        deny: BigInt(perm.deny)
-                    });
-                }
+        guild.channels
+            .create({
+                name: categoryData.name,
+                type: ChannelType.GuildCategory
+            })
+            .then(async (category) => {
+                // When the category is created
+                const finalPermissions: OverwriteData[] = [];
+                categoryData.permissions.forEach((perm) => {
+                    const role = guild.roles.cache.find((r) => r.name === perm.roleName);
+                    if (role) {
+                        finalPermissions.push({
+                            id: role.id,
+                            allow: BigInt(perm.allow),
+                            deny: BigInt(perm.deny)
+                        });
+                    }
+                });
+                await category.permissionOverwrites.set(finalPermissions);
+                resolve(category); // Return the category
             });
-            await category.permissionOverwrites.set(finalPermissions);
-            resolve(category); // Return the category
-        });
     });
 }
 
@@ -206,13 +219,20 @@ export async function loadChannel(
     options?: LoadOptions
 ) {
     return new Promise(async (resolve) => {
-
-        const loadMessages = (channel: TextChannel | ThreadChannel, messages: MessageData[], previousWebhook?: Webhook): Promise<Webhook|void> => {
+        const loadMessages = (
+            channel: TextChannel | ThreadChannel,
+            messages: MessageData[],
+            previousWebhook?: Webhook
+        ): Promise<Webhook | void> => {
             return new Promise(async (resolve) => {
-                const webhook = previousWebhook || await (channel as TextChannel).createWebhook({
-                    name: 'MessagesBackup',
-                    avatar: channel.client.user.displayAvatarURL()
-                }).catch(() => {});
+                const webhook =
+                    previousWebhook ||
+                    (await (channel as TextChannel)
+                        .createWebhook({
+                            name: 'MessagesBackup',
+                            avatar: channel.client.user.displayAvatarURL()
+                        })
+                        .catch(() => {}));
                 if (!webhook) return resolve();
                 messages = messages
                     .filter((m) => m.content.length > 0 || m.embeds.length > 0 || m.files.length > 0)
@@ -236,7 +256,7 @@ export async function loadChannel(
                 }
                 resolve(webhook);
             });
-        }
+        };
 
         const createOptions: GuildChannelCreateOptions = {
             name: channelData.name,
@@ -248,13 +268,17 @@ export async function loadChannel(
             createOptions.nsfw = (channelData as TextChannelData).nsfw;
             createOptions.rateLimitPerUser = (channelData as TextChannelData).rateLimitPerUser;
             createOptions.type =
-                (channelData as TextChannelData).isNews && guild.features.includes(GuildFeature.News) ? ChannelType.GuildNews : ChannelType.GuildText;
+                (channelData as TextChannelData).isNews && guild.features.includes(GuildFeature.News)
+                    ? ChannelType.GuildNews
+                    : ChannelType.GuildText;
         } else if (channelData.type === ChannelType.GuildVoice) {
             // Downgrade bitrate
             let bitrate = (channelData as VoiceChannelData).bitrate;
-            const bitrates = Object.values(MaxBitratePerTier);
-            while (bitrate > MaxBitratePerTier[guild.premiumTier]) {
-                bitrate = bitrates[Object.keys(MaxBitratePerTier).indexOf(guild.premiumTier) - 1];
+            while (Math.min(bitrate, guild.maximumBitrate)) {
+                if ([GuildPremiumTier[guild.premiumTier] === 'None']) bitrate = 64000;
+                if ([GuildPremiumTier[guild.premiumTier] === 'Tier1']) bitrate = 128000;
+                if ([GuildPremiumTier[guild.premiumTier] === 'Tier1']) bitrate = 256000;
+                if ([GuildPremiumTier[guild.premiumTier] === 'Tier1']) bitrate = 384000;
             }
             createOptions.bitrate = bitrate;
             createOptions.userLimit = (channelData as VoiceChannelData).userLimit;
@@ -276,24 +300,32 @@ export async function loadChannel(
             await channel.permissionOverwrites.set(finalPermissions);
             if (channelData.type === ChannelType.GuildText) {
                 /* Load messages */
-                let webhook: Webhook|void;
+                let webhook: Webhook | void;
                 if ((channelData as TextChannelData).messages.length > 0) {
-                    webhook = await loadMessages(channel as TextChannel, (channelData as TextChannelData).messages).catch(() => {});
+                    webhook = await loadMessages(
+                        channel as TextChannel,
+                        (channelData as TextChannelData).messages
+                    ).catch(() => {});
                 }
                 /* Load threads */
-                if ((channelData as TextChannelData).threads.length > 0) { //&& guild.features.includes('THREADS_ENABLED')) {
-                    await Promise.all((channelData as TextChannelData).threads.map(async (threadData) => {
-                        let autoArchiveDuration = threadData.autoArchiveDuration;
-                        //if (!guild.features.includes('SEVEN_DAY_THREAD_ARCHIVE') && autoArchiveDuration === 10080) autoArchiveDuration = 4320;
-                        //if (!guild.features.includes('THREE_DAY_THREAD_ARCHIVE') && autoArchiveDuration === 4320) autoArchiveDuration = 1440;
-                        return (channel as TextChannel).threads.create({
-                            name: threadData.name,
-                            autoArchiveDuration
-                        }).then((thread) => {
-                            if (!webhook) return;
-                            return loadMessages(thread, threadData.messages, webhook);
-                        });
-                    }));
+                if ((channelData as TextChannelData).threads.length > 0) {
+                    //&& guild.features.includes('THREADS_ENABLED')) {
+                    await Promise.all(
+                        (channelData as TextChannelData).threads.map(async (threadData) => {
+                            let autoArchiveDuration = threadData.autoArchiveDuration;
+                            //if (!guild.features.includes('SEVEN_DAY_THREAD_ARCHIVE') && autoArchiveDuration === 10080) autoArchiveDuration = 4320;
+                            //if (!guild.features.includes('THREE_DAY_THREAD_ARCHIVE') && autoArchiveDuration === 4320) autoArchiveDuration = 1440;
+                            return (channel as TextChannel).threads
+                                .create({
+                                    name: threadData.name,
+                                    autoArchiveDuration
+                                })
+                                .then((thread) => {
+                                    if (!webhook) return;
+                                    return loadMessages(thread, threadData.messages, webhook);
+                                });
+                        })
+                    );
                 }
                 return channel;
             } else {
@@ -341,6 +373,10 @@ export async function clearGuild(guild: Guild) {
         guild.setVerificationLevel(GuildVerificationLevel.None);
     }
     guild.setSystemChannel(null);
-    guild.setSystemChannelFlags([GuildSystemChannelFlags.SuppressGuildReminderNotifications, GuildSystemChannelFlags.SuppressJoinNotifications, GuildSystemChannelFlags.SuppressPremiumSubscriptions]);
+    guild.setSystemChannelFlags([
+        GuildSystemChannelFlags.SuppressGuildReminderNotifications,
+        GuildSystemChannelFlags.SuppressJoinNotifications,
+        GuildSystemChannelFlags.SuppressPremiumSubscriptions
+    ]);
     return;
 }
