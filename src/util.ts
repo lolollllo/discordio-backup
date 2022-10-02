@@ -263,13 +263,13 @@ export async function loadChannel(
             type: null,
             parent: category
         };
-        if (channelData.type === ChannelType.GuildText || channelData.type === ChannelType.GuildNews) {
+        if (channelData.type === ChannelType.GuildText || channelData.type === ChannelType.GuildAnnouncement) {
             createOptions.topic = (channelData as TextChannelData).topic;
             createOptions.nsfw = (channelData as TextChannelData).nsfw;
             createOptions.rateLimitPerUser = (channelData as TextChannelData).rateLimitPerUser;
             createOptions.type =
                 (channelData as TextChannelData).isNews && guild.features.includes(GuildFeature.News)
-                    ? ChannelType.GuildNews
+                    ? ChannelType.GuildAnnouncement
                     : ChannelType.GuildText;
         } else if (channelData.type === ChannelType.GuildVoice) {
             // Downgrade bitrate

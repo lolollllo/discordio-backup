@@ -1,6 +1,5 @@
 import type { BackupData, LoadOptions } from './types';
-import type { Emoji, ForumChannel, Guild, NewsChannel, Role, VoiceBasedChannel, VoiceChannel } from 'discord.js';
-import { ChannelType, GuildFeature, TextChannel } from 'discord.js';
+import { ChannelType, Emoji, ForumChannel, Guild, GuildFeature, NewsChannel, Role, Snowflake, StageChannel, TextChannel, VoiceChannel } from 'discord.js';
 import { loadCategory, loadChannel } from './util';
 
 /**
@@ -78,7 +77,7 @@ export const loadChannels = (guild: Guild, backupData: BackupData, options: Load
         loadChannelPromises.push(
             new Promise((resolve) => {
                 loadCategory(categoryData, guild).then((createdCategory) => {
-                    categoryData.children.forEach((channelData: any) => {
+                    categoryData.children.forEach((channelData) => {
                         loadChannel(channelData, guild, createdCategory, options);
                         resolve(true);
                     });
@@ -98,13 +97,7 @@ export const loadChannels = (guild: Guild, backupData: BackupData, options: Load
 export const loadAFK = (guild: Guild, backupData: BackupData): Promise<Guild[]> => {
     const afkPromises: Promise<Guild>[] = [];
     if (backupData.afk) {
-        afkPromises.push(
-            guild.setAFKChannel(
-                guild.channels.cache.find(
-                    (ch) => ch.name === backupData.afk.name && ch.type === ChannelType.GuildVoice
-                ) as VoiceChannel
-            )
-        );
+        afkPromises.push(guild.setAFKChannel(guild.channels.cache.find((ch) => ch.name === backupData.afk.name && ch.type === ChannelType.GuildVoice) as VoiceChannel));
         afkPromises.push(guild.setAFKTimeout(backupData.afk.timeout));
     }
     return Promise.all(afkPromises);
@@ -119,9 +112,7 @@ export const loadEmojis = (guild: Guild, backupData: BackupData): Promise<Emoji[
         if (emoji.url) {
             emojiPromises.push(guild.emojis.create({ attachment: emoji.url, name: emoji.name }));
         } else if (emoji.base64) {
-            emojiPromises.push(
-                guild.emojis.create({ attachment: Buffer.from(emoji.base64, 'base64'), name: emoji.name })
-            );
+            emojiPromises.push(guild.emojis.create({ attachment: Buffer.from(emoji.base64, 'base64'), name: emoji.name }));
         }
     });
     return Promise.all(emojiPromises);
@@ -151,11 +142,7 @@ export const loadEmbedChannel = (guild: Guild, backupData: BackupData): Promise<
         embedChannelPromises.push(
             guild.setWidgetSettings({
                 enabled: backupData.widget.enabled,
-                channel: guild.channels.cache.find((ch) => ch.name === backupData.widget.channel) as
-                    | TextChannel
-                    | VoiceBasedChannel
-                    | ForumChannel
-                    | NewsChannel
+                channel: guild.channels.cache.find((ch) => ch.name === backupData.widget.channel) as TextChannel | NewsChannel | VoiceChannel | StageChannel | ForumChannel | Snowflake
             })
         );
     }
