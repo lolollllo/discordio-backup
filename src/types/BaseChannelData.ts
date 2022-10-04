@@ -2,7 +2,7 @@ import { TextBasedChannelTypes, VoiceBasedChannelTypes, ThreadChannelType } from
 import { ChannelPermissionsData } from './';
 
 export interface BaseChannelData {
-    type: TextBasedChannelTypes | VoiceBasedChannelTypes | ThreadChannelType;
+    type: TextBasedChannelTypes | VoiceBasedChannelTypes | ThreadChannelType | number;
     name: string;
     parent?: string;
     permissions: ChannelPermissionsData[];

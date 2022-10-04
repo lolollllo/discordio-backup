@@ -275,10 +275,8 @@ export async function loadChannel(
             // Downgrade bitrate
             let bitrate = (channelData as VoiceChannelData).bitrate;
             while (Math.min(bitrate, guild.maximumBitrate)) {
-                if ([GuildPremiumTier[guild.premiumTier] === 'None']) bitrate = 64000;
-                if ([GuildPremiumTier[guild.premiumTier] === 'Tier1']) bitrate = 128000;
-                if ([GuildPremiumTier[guild.premiumTier] === 'Tier1']) bitrate = 256000;
-                if ([GuildPremiumTier[guild.premiumTier] === 'Tier1']) bitrate = 384000;
+                let bitrates = [64000, 128000, 256000, 384000]
+                bitrate = bitrates[guild.premiumTier] 
             }
             createOptions.bitrate = bitrate;
             createOptions.userLimit = (channelData as VoiceChannelData).userLimit;
